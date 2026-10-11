@@ -29,7 +29,7 @@ def z_neighbours(current_state):
     col_array, row_array = array_values(current_state)
     for i in range(len(current_state)):
         if z_col == col_array[current_state.index(i)] and z_row-1 == row_array[current_state.index(i)] or z_col == col_array[current_state.index(i)] and z_row+1 == row_array[current_state.index(i)] or z_row == row_array[current_state.index(i)] and z_col-1 == col_array[current_state.index(i)] or z_row == row_array[current_state.index(i)] and z_col+1 == col_array[current_state.index(i)]:
-            results += (current_state[i],)
+            results += (current_state.index(i),)
     return results
 def test_neighbours(current_state):
     results = ()
@@ -37,7 +37,7 @@ def test_neighbours(current_state):
     z_pos = current_state.index(0)
     for i in range(len(neighbours)):
         test_state = current_state
-        test_state[neighbours[i]] = z_pos
-        test_state[z_pos] = neighbours[i]
-        results += (hamming_distance(test_state),)
+        test_state[neighbours[i]] = 0
+        test_state[z_pos] = current_state[neighbours[i]]
+        results += (,)
     return min(results)
