@@ -15,12 +15,29 @@ def row_calc(x):
 def col_calc(x):
     col = x % 3
     return col
-def position_eval(current_state):
-    results=[]
+def array_values(array):
+    col_array = ()
+    row_arry= ()
     for i in range(len(current_state)):
-        if row(current_state[i])==row(current_state[current_state.index(0)]) || col(current_state[i])==col(current_state[current_state.index(0)]):
-            results.append(current_state[i])
-    for i in range(len(results)):
-        test_state()
+        col_array += (col_calc(current_state[i]),)
+        row_arry += (row_calc(current_state[i]),)
+    return (col_array, row_arry)
+def z_neighbours(current_state):
+    results=()
+    z_col = col_calc(current_state.index(0))
+    z_row = row_calc(current_state.index(0))
+    col_array, row_array = array_values(current_state)
+    for i in range(len(current_state)):
+        if z_col == col_array[current_state.index(i)] and z_row-1 == row_array[current_state.index(i)] or z_col == col_array[current_state.index(i)] and z_row+1 == row_array[current_state.index(i)] or z_row == row_array[current_state.index(i)] and z_col-1 == col_array[current_state.index(i)] or z_row == row_array[current_state.index(i)] and z_col+1 == col_array[current_state.index(i)]:
+            results += (current_state[i],)
+    return results
+def test_neighbours(current_state):
+    results = ()
+    neighbours = z_neighbours(current_state)
+    z_pos = current_state.index(0)
+    for i in range(len(neighbours)):
+        test_state = current_state
+        test_state[neighbours[i]] = z_pos
+        test_state[z_pos] = neighbours[i]
+        results += (hamming_distance(test_state),)
     return min(results)
-def calc_loop(start):
