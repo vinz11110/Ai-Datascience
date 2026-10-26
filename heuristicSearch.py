@@ -70,7 +70,7 @@ def a_star_search(start_state, goal_state, heuristic_function):
     """
     Function: Main puzzle solving function, running a loop until the final result is reached
     Inputs: starting state of grid, goal state of grid and which heuristic function is to be used
-    Outputs: Amount of nodes tested and if goal is reached also the final score 
+    Outputs: Amount of nodes tested and if goal is reached also amount of tiles moved to reach goal
     """
     #The priority queue stores tuples of: (f_score, g_score, current_state)
     queue = []
