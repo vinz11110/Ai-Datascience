@@ -149,4 +149,3 @@ def heuristic_manhatten(state, goal_state):
             total_distance += abs(current_row - goal_row) + abs(current_col - goal_col)
 
     return total_distance
-
