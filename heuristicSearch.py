@@ -106,3 +106,46 @@ def a_star_search(start_state, goal_state, heuristic_function):
                 heapq.heappush(queue, (new_f, new_g, neighbor))
 
     return None, nodes_expanded #If no solution is found
+
+
+def heuristic_hamming(state, goal_state):
+    # Calculates the Hamming distance by counting how many tiles are not in their correct position.
+    # Blank tile (0) is ignored.
+    # state           = current 3x3 board state
+    # goal_state      = target 3x3 board state
+    # misplaced_count = total number of misplaced tiles
+
+    misplaced_count = 0
+    for i in range(len(state)):
+        if state[i] != 0 and state[i] != goal_state[i]:
+            misplaced_count += 1
+
+    return misplaced_count
+
+def heuristic_manhatten(state, goal_state):
+    # Calculates the Manhatten distance by summing vertical and horizontal distances of each tile to its
+    # target position. Blank tile (0) is ignored.
+    # state          = current 3x3 board state
+    # goal_state     = target 3x3 board state
+    # total_distance = sum of all Manhatten distances
+
+    total_distance = 0
+    for i in range(len(state)):
+        tile = state[i]
+
+        if tile != 0:
+            # Find index of the current tile in the goal state
+            goal_index = goal_state.index(tile)
+
+            # Calculating current coordinates
+            current_row = i // 3
+            current_col = i % 3
+
+            # Calculating goal coordinates
+            goal_row = goal_index // 3
+            goal_col = goal_index % 3
+
+            # Adding the absolute distance to the total
+            total_distance += abs(current_row - goal_row) + abs(current_col - goal_col)
+
+    return total_distance
