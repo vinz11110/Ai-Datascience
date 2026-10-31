@@ -1,4 +1,8 @@
 import heapq
+import heapq
+import random
+import time
+import statistics
 
 goal_state = (0, 1, 2, 3, 4, 5, 6, 7, 8)
 
@@ -55,7 +59,7 @@ def checkSolvability(start_state):
     Outputs: boolean based on calculation
     """
     # Remove the blank tile (0) for the math to work
-    flat_state = [tile for tile in state if tile != 0]
+    flat_state = [tile for tile in start_state if tile != 0]
     inversions = 0
     
     # Compare every tile to all the tiles that come after it
@@ -66,7 +70,7 @@ def checkSolvability(start_state):
                 
     return inversions % 2 == 0
 
-def a_star_search(start_state, goal_state, heuristic_function):
+def a_star_search(start_state, heuristic_function):
     """
     Function: Main puzzle solving function, running a loop until the final result is reached
     Inputs: starting state of grid, goal state of grid and which heuristic function is to be used
@@ -109,11 +113,11 @@ def a_star_search(start_state, goal_state, heuristic_function):
 
 
 def heuristic_hamming(state, goal_state):
-    # Calculates the Hamming distance by counting how many tiles are not in their correct position.
-    # Blank tile (0) is ignored.
-    # state           = current 3x3 board state
-    # goal_state      = target 3x3 board state
-    # misplaced_count = total number of misplaced tiles
+    #Calculates the Hamming distance by counting how many tiles are not in their correct position.
+    #Blank tile (0) is ignored.
+    #state           = current 3x3 board state
+    #goal_state      = target 3x3 board state
+    #misplaced_count = total number of misplaced tiles
 
     misplaced_count = 0
     for i in range(len(state)):
@@ -123,29 +127,86 @@ def heuristic_hamming(state, goal_state):
     return misplaced_count
 
 def heuristic_manhatten(state, goal_state):
-    # Calculates the Manhatten distance by summing vertical and horizontal distances of each tile to its
-    # target position. Blank tile (0) is ignored.
-    # state          = current 3x3 board state
-    # goal_state     = target 3x3 board state
-    # total_distance = sum of all Manhatten distances
+    #Calculates the Manhatten distance by summing vertical and horizontal distances of each tile to its
+    #target position. Blank tile (0) is ignored.
+    #state          = current 3x3 board state
+    #goal_state     = target 3x3 board state
+    #total_distance = sum of all Manhatten distances
 
     total_distance = 0
     for i in range(len(state)):
         tile = state[i]
 
         if tile != 0:
-            # Find index of the current tile in the goal state
+            #Find index of the current tile in the goal state
             goal_index = goal_state.index(tile)
 
-            # Calculating current coordinates
+            #Calculating current coordinates
             current_row = i // 3
             current_col = i % 3
 
-            # Calculating goal coordinates
+            #Calculating goal coordinates
             goal_row = goal_index // 3
             goal_col = goal_index % 3
 
-            # Adding the absolute distance to the total
+            #Adding the absolute distance to the total
             total_distance += abs(current_row - goal_row) + abs(current_col - goal_col)
 
     return total_distance
+
+def generate_states(num_states):
+    """
+    Function: Generates a list of valid, solvable random 8-puzzle states.
+    Inputs: num_states (how many states to generate)
+    Outputs: list of tuples (solvable start states)
+    """
+    states = []
+    while len(states) < num_states:
+        new_state = list(goal_state)
+        random.shuffle(new_state)
+        new_state_tuple = tuple(new_state)
+        
+        #Only keep the state if it is mathematically solvable
+        if checkSolvability(new_state_tuple):
+            states.append(new_state_tuple)
+            
+    return states
+
+def run_benchmark():
+    """
+    Function: Runs A* search with both heuristics on 100 random states and calculates the performance metrics.
+    Inputs: /
+    Outputs: Prints mean and standard deviation for time and expanded nodes.
+    """
+    states = generate_states(100)
+    
+    hamming_times, hamming_nodes = [], []
+    manhattan_times, manhattan_nodes = [], []
+    
+    for state in states:
+        #Benchmark Hamming
+        start_time = time.time()
+        _, nodes = a_star_search(state, heuristic_hamming)
+        end_time = time.time()
+        
+        hamming_times.append(end_time - start_time)
+        hamming_nodes.append(nodes)
+        
+        #Benchmark Manhattan
+        start_time = time.time()
+        _, nodes = a_star_search(state, heuristic_manhatten)
+        end_time = time.time()
+        
+        manhattan_times.append(end_time - start_time)
+        manhattan_nodes.append(nodes)
+        
+    #Output Results
+    print("=== Hamming Heuristic ===")
+    print(f"Nodes Expanded: Mean = {statistics.mean(hamming_nodes):.2f}, StdDev = {statistics.stdev(hamming_nodes):.2f}")
+    print(f"Execution Time: Mean = {statistics.mean(hamming_times):.5f}s, StdDev = {statistics.stdev(hamming_times):.5f}s\n")
+    
+    print("=== Manhattan Heuristic ===")
+    print(f"Nodes Expanded: Mean = {statistics.mean(manhattan_nodes):.2f}, StdDev = {statistics.stdev(manhattan_nodes):.2f}")
+    print(f"Execution Time: Mean = {statistics.mean(manhattan_times):.5f}s, StdDev = {statistics.stdev(manhattan_times):.5f}s")
+
+run_benchmark()
